@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UNFLD POWER</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #F9F3DD;
+            color: #1a1a1a;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem 1rem;
+        }
+
+        /* Loading Animation */
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #F9F3DD;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            transition: opacity 0.6s ease, visibility 0.6s ease;
+        }
+        
+        .loading-screen.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+        
+        .unfld-animation {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .unfld-letter {
+            font-size: 4em;
+            font-weight: 700;
+            letter-spacing: 6px;
+            color: #1a1a1a;
+            opacity: 0;
+            transform: translateY(30px);
+            animation: unfoldLetter 0.5s ease forwards;
+        }
+        
+        .unfld-letter:nth-child(1) { animation-delay: 0.1s; }
+        .unfld-letter:nth-child(2) { animation-delay: 0.2s; }
+        .unfld-letter:nth-child(3) { animation-delay: 0.3s; }
+        .unfld-letter:nth-child(4) { animation-delay: 0.4s; }
+        .unfld-letter:nth-child(5) { animation-delay: 0.5s; }
+        
+        @keyframes unfoldLetter {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .container {
+            max-width: 600px;
+            width: 100%;
+            opacity: 0;
+            animation: containerFadeIn 0.8s ease 1.2s forwards;
+        }
+
+        @keyframes containerFadeIn {
+            to { opacity: 1; } 100%;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px 30px;
+            background: #FFFFFF;
+            border-radius: 12px;
+            border: 1px solid rgba(139, 115, 85, 0.15);
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+        }
+
+        .brand-text {
+            font-size: 1.6em;
+            font-weight: 700;
+            letter-spacing: 6px;
+            color: #1a1a1a;
+        }
+
+        .mode-selector {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .mode-btn {
+            background: #789080;
+            color: #F9F3DD;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+
+        .mode-btn.active {
+            background: #6d7a70;
+            color: #F9F3DD;
+        }
+
+        .mode-btn:hover {
+            background: #6d7a70;
+            transform: translateY(-2px);
+        }
+
+        .view-container {
+            margin-bottom: 2rem;
+        }
+
+        .spread-view {
+            display: none;
+        }
+
+        .spread-view.active {
+            display: block;
+        }
+
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .mini-card {
+            background: #FFFFFF;
+            border-radius: 12px;
+            padding: 1.5rem 1rem;
+            min-height: 180px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 1px solid rgba(139, 115, 85, 0.15);
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+        }
+
+        .mini-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(120,144,128,0.4);
+        }
+
+        .mini-card.drawn {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .mini-card.drawn:hover {
+            transform: none;
+        }
+
+        .mini-card-title {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 0.5rem;
+            letter-spacing: 0.02em;
+            text-transform: uppercase;
+        }
+
+        .mini-card-command {
+            font-size: 0.75rem;
+            color: #5d4037;
+            line-height: 1.4;
+        }
+
+        .draw-view {
+            display: none;
+        }
+
+        .draw-view.active {
+            display: block;
+        }
+
+        .deck-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 2rem;
+            position: relative;
+            height: 400px;
+        }
+
+        .deck-stack {
+            position: relative;
+            width: 280px;
+            height: 400px;
+        }
+
+        .deck-card {
+            position: absolute;
+            width: 280px;
+            height: 400px;
+            background: linear-gradient(135deg, #789080 0%, #6d7a70 100%);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: #F9F3DD;
+            letter-spacing: 0.2em;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .deck-card:hover {
+            transform: translateY(-8px);
+        }
+
+        .deck-card:nth-child(1) { transform: translate(0, 0); z-index: 5; }
+        .deck-card:nth-child(2) { transform: translate(-2px, -2px); z-index: 4; }
+        .deck-card:nth-child(3) { transform: translate(-4px, -4px); z-index: 3; }
+        .deck-card:nth-child(4) { transform: translate(-6px, -6px); z-index: 2; }
+        .deck-card:nth-child(5) { transform: translate(-8px, -8px); z-index: 1; }
+
+        .selected-card-display {
+            background: #FFFFFF;
+            border-radius: 16px;
+            padding: 3rem 2rem;
+            min-height: 400px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            border: 1px solid rgba(139, 115, 85, 0.15);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+
+        .selected-card-display.hidden {
+            display: none;
+        }
+
+        .card-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 1.5rem;
+            letter-spacing: 0.02em;
+            text-transform: uppercase;
+        }
+
+        .card-command {
+            font-size: 1.1rem;
+            color: #5d4037;
+            line-height: 1.6;
+            max-width: 400px;
+            margin-bottom: 2rem;
+        }
+
+        .commit-btn {
+            background: #789080;
+            color: #F9F3DD;
+            border: none;
+            padding: 1rem 3rem;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            margin-top: 1rem;
+        }
+
+        .commit-btn:hover {
+            background: #6d7a70;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(120,144,128,0.4);
+        }
+
+        .executed-badge {
+            display: none;
+            background: rgba(120,144,128,0.15);
+            color: #789080;
+            padding: 0.75rem 2rem;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            margin-top: 1rem;
+        }
+
+        .executed-badge.visible {
+            display: block;
+            animation: fadeInScale 0.5s ease;
+        }
+
+        @keyframes fadeInScale {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .shifted-prompt {
+            display: none;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(93,64,55,0.2);
+            width: 100%;
+        }
+
+        .shifted-prompt.visible {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .shifted-question {
+            font-size: 1.1rem;
+            color: #5d4037;
+            font-style: italic;
+            margin-bottom: 0.5rem;
+        }
+
+        .shifted-note {
+            font-size: 0.85rem;
+            color: #8b7355;
+        }
+
+        .controls {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        button {
+            background: #789080;
+            color: #F9F3DD;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+
+        button:hover {
+            background: #6d7a70;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(120,144,128,0.4);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .progress {
+            background: #FFFFFF;
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(139, 115, 85, 0.15);
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .progress-label {
+            font-size: 0.9rem;
+            color: #1a1a1a;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-weight: 700;
+        }
+
+        .progress-count {
+            font-size: 1.5rem;
+            color: #1a1a1a;
+            font-weight: 600;
+        }
+
+        .progress-bar-container {
+            display: flex;
+            gap: 8px;
+            height: 12px;
+        }
+
+        .progress-segment {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.6);
+            border: 1.5px solid rgba(139, 115, 85, 0.3);
+            border-radius: 6px;
+            transition: all 0.5s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .progress-segment.filled {
+            background: linear-gradient(135deg, #789080 0%, #8fa393 100%);
+            border: 2px solid #9fb5a8;
+            box-shadow: 0 0 15px rgba(120, 144, 128, 0.5);
+        }
+        
+        .progress-segment.filled::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            animation: shimmer 2s infinite;
+        }
+        
+        @keyframes shimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        .instructions {
+            background: #FFFFFF;
+            padding: 1.5rem;
+            border-radius: 12px;
+            text-align: center;
+            border: 1px solid rgba(139, 115, 85, 0.15);
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+        }
+
+        .instructions p {
+            color: #1a1a1a;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            font-weight: 500;
+        }
+
+        .instructions p strong {
+            color: #1a1a1a;
+            font-weight: 700;
+        }
+
+        @media (max-width: 640px) {
+            .brand-text {
+                font-size: 1.3em;
+                letter-spacing: 4px;
+            }
+
+            .card-title {
+                font-size: 2rem;
+            }
+            
+            .card-command {
+                font-size: 1rem;
+            }
+            
+            button {
+                padding: 0.875rem 1.5rem;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div class="loading-screen" id="loading-screen">
+        <div class="unfld-animation">
+            <span class="unfld-letter">U</span>
+            <span class="unfld-letter">N</span>
+            <span class="unfld-letter">F</span>
+            <span class="unfld-letter">L</span>
+            <span class="unfld-letter">D</span>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <div class="brand-text">UNFLD POWER</div>
+        </div>
+
+        <div class="mode-selector">
+            <button class="mode-btn active" id="spread-mode-btn">View All Cards</button>
+            <button class="mode-btn" id="draw-mode-btn">Draw Random</button>
+        </div>
+
+        <div class="progress">
+            <div class="progress-header">
+                <span class="progress-label">Cards Executed</span>
+                <span class="progress-count"><span id="drawn-count">0</span>/20</span>
+            </div>
+            <div class="progress-bar-container" id="progress-bar">
+                <!-- Progress segments will be generated here -->
+            </div>
+        </div>
+
+        <!-- SPREAD VIEW (All Cards Visible) -->
+        <div class="view-container spread-view active" id="spread-view">
+            <div class="cards-grid" id="cards-grid"></div>
+        </div>
+
+        <!-- DRAW VIEW (Deck Stack) -->
+        <div class="view-container draw-view" id="draw-view">
+            <div class="deck-container">
+                <div class="deck-stack" id="deck-stack">
+                    <div class="deck-card">POWER</div>
+                    <div class="deck-card">POWER</div>
+                    <div class="deck-card">POWER</div>
+                    <div class="deck-card">POWER</div>
+                    <div class="deck-card">POWER</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Selected Card Display -->
+        <div class="selected-card-display hidden" id="selected-card">
+            <div class="card-title" id="display-title"></div>
+            <div class="card-command" id="display-command"></div>
+            <button class="commit-btn" id="commit-btn">Commit</button>
+            <div class="executed-badge" id="executed-badge">Executed</div>
+            <div class="shifted-prompt" id="shifted-prompt">
+                <div class="shifted-question">What shifted?</div>
+                <div class="shifted-note">No journal required. Just notice.</div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button id="reset-btn">Reset All Cards</button>
+        </div>
+
+        <div class="instructions">
+            <p><strong>View All</strong> — Choose the card that calls you.<br>
+            <strong>Draw Random</strong> — Let intuition decide.<br>
+            Execute within 24 hours. Momentum follows action.</p>
+        </div>
+    </div>
+
+    <script>
+        const cards = [
+            { title: "SPARK", command: "Start now, before you feel ready" },
+            { title: "FIRST STEP", command: "Take one small action toward the big goal today" },
+            { title: "SAY IT", command: "Start the conversation you have been avoiding" },
+            { title: "BOLD MOVE", command: "Do one thing today that scares you publicly" },
+            { title: "GHOST MODE", command: "Disappear for 30 mins. No explanation." },
+            { title: "NO MODE", command: "Say no to one thing that drains you" },
+            { title: "PHONE VAULT", command: "Lock your phone away for a focused hour" },
+            { title: "EXECUTION ZONE", command: "Enter one hour where only results matter" },
+            { title: "ONE THING", command: "Do something that excites you without judgment" },
+            { title: "HARD CHOICES", command: "Embrace discomfort as your training ground today" },
+            { title: "NEW FLOOR", command: "Set the line you will never drop below again" },
+            { title: "WALK AWAY", command: "Remove yourself from one situation beneath your standards" },
+            { title: "BREAK FREE", command: "Drop one pattern that keeps you small" },
+            { title: "UPGRADE ONLY", command: "Replace one low-value habit with a higher-standard choice" },
+            { title: "RAISE THE BAR", command: "Pick one decision and honor it for 30 days minimum" },
+            { title: "CLEAN SLATE", command: "Release one regret or story from the past" },
+            { title: "NEXT MOVE", command: "Choose one concrete step you can take in the next hour" },
+            { title: "WIN STATE", command: "Describe the future you have already claimed" },
+            { title: "LOCK IN", command: "Burn the bridge to second-guessing for this goal" },
+            { title: "COMMIT", command: "Choose one promise to yourself and follow through today" }
+        ];
+
+        let drawnIndices = new Set();
+
+        // Elements
+        const spreadModeBtn = document.getElementById('spread-mode-btn');
+        const drawModeBtn = document.getElementById('draw-mode-btn');
+        const spreadView = document.getElementById('spread-view');
+        const drawView = document.getElementById('draw-view');
+        const cardsGrid = document.getElementById('cards-grid');
+        const deckStack = document.getElementById('deck-stack');
+        const selectedCard = document.getElementById('selected-card');
+        const displayTitle = document.getElementById('display-title');
+        const displayCommand = document.getElementById('display-command');
+        const commitBtn = document.getElementById('commit-btn');
+        const executedBadge = document.getElementById('executed-badge');
+        const shiftedPrompt = document.getElementById('shifted-prompt');
+        const resetBtn = document.getElementById('reset-btn');
+        const drawnCount = document.getElementById('drawn-count');
+        const progressBar = document.getElementById('progress-bar');
+
+        // Initialize progress segments
+        function initializeProgressBar() {
+            progressBar.innerHTML = '';
+            for (let i = 0; i < cards.length; i++) {
+                const segment = document.createElement('div');
+                segment.className = 'progress-segment';
+                segment.id = `segment-${i}`;
+                progressBar.appendChild(segment);
+            }
+        }
+
+        // Update progress
+        function updateProgress() {
+            const count = drawnIndices.size;
+            drawnCount.textContent = count;
+            
+            // Update segments
+            for (let i = 0; i < cards.length; i++) {
+                const segment = document.getElementById(`segment-${i}`);
+                if (i < count) {
+                    segment.classList.add('filled');
+                } else {
+                    segment.classList.remove('filled');
+                }
+            }
+        }
+
+        // Initialize spread view
+        function renderSpreadView() {
+            cardsGrid.innerHTML = '';
+            cards.forEach((card, index) => {
+                const miniCard = document.createElement('div');
+                miniCard.className = 'mini-card';
+                if (drawnIndices.has(index)) {
+                    miniCard.classList.add('drawn');
+                }
+                miniCard.innerHTML = `
+                    <div class="mini-card-title">${card.title}</div>
+                    <div class="mini-card-command">${card.command}</div>
+                `;
+                if (!drawnIndices.has(index)) {
+                    miniCard.addEventListener('click', () => selectCard(index));
+                }
+                cardsGrid.appendChild(miniCard);
+            });
+        }
+
+        // Select card from spread
+        function selectCard(index) {
+            drawnIndices.add(index);
+            displayTitle.textContent = cards[index].title;
+            displayCommand.textContent = cards[index].command;
+            selectedCard.classList.remove('hidden');
+            
+            // Reset commit state
+            commitBtn.style.display = 'block';
+            executedBadge.classList.remove('visible');
+            shiftedPrompt.classList.remove('visible');
+            
+            updateProgress();
+            renderSpreadView();
+            
+            // Scroll to selected card
+            selectedCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        // Commit button handler
+        commitBtn.addEventListener('click', () => {
+            commitBtn.style.display = 'none';
+            executedBadge.classList.add('visible');
+            
+            // Show "What shifted?" after a moment
+            setTimeout(() => {
+                shiftedPrompt.classList.add('visible');
+            }, 500);
+        });
+
+        // Draw random card
+        function drawRandomCard() {
+            const available = cards.map((_, i) => i).filter(i => !drawnIndices.has(i));
+            if (available.length === 0) {
+                alert('All cards have been drawn. Reset to continue.');
+                return;
+            }
+            const randomIndex = available[Math.floor(Math.random() * available.length)];
+            selectCard(randomIndex);
+        }
+
+        // Initialize
+        initializeProgressBar();
+        renderSpreadView();
+
+        // Hide loading screen after animation
+        setTimeout(() => {
+            document.getElementById('loading-screen').classList.add('hidden');
+        }, 1500);
+
+        // Mode switching
+        spreadModeBtn.addEventListener('click', () => {
+            spreadModeBtn.classList.add('active');
+            drawModeBtn.classList.remove('active');
+            spreadView.classList.add('active');
+            drawView.classList.remove('active');
+        });
+
+        drawModeBtn.addEventListener('click', () => {
+            drawModeBtn.classList.add('active');
+            spreadModeBtn.classList.remove('active');
+            drawView.classList.add('active');
+            spreadView.classList.remove('active');
+        });
+
+        // Deck click to draw
+        deckStack.addEventListener('click', drawRandomCard);
+
+        // Reset
+        resetBtn.addEventListener('click', () => {
+            drawnIndices.clear();
+            selectedCard.classList.add('hidden');
+            updateProgress();
+            renderSpreadView();
+        });
+
+        // Initialize
+        renderSpreadView();
+    </script>
+</body>
+</html>
