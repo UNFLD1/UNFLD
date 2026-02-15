@@ -1,3 +1,6 @@
 {
-     "cleanUrls": true
-   }
+  "redirects": [
+    { "source": "/power", "destination": "/power.html" },
+    { "source": "/timeline", "destination": "/timeline.html" }
+  ]
+}
