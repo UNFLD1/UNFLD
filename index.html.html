@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="light only">
+    <title>UNFLD - Digital Execution System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            background: #D9BFA4;
+            color: #1a1a1a;
+            padding: 30px 20px;
+            min-height: 100vh;
+        }
+        
+        /* Loading Animation */
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #D9BFA4;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            transition: opacity 0.6s ease, visibility 0.6s ease;
+        }
+        
+        .loading-screen.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+        
+        .unfld-animation {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .unfld-letter {
+            font-size: 4em;
+            font-weight: 700;
+            letter-spacing: 6px;
+            color: #1a1a1a;
+            opacity: 0;
+            transform: translateY(30px);
+            animation: unfoldLetter 0.5s ease forwards;
+        }
+        
+        .unfld-letter:nth-child(1) { animation-delay: 0.1s; }
+        .unfld-letter:nth-child(2) { animation-delay: 0.2s; }
+        .unfld-letter:nth-child(3) { animation-delay: 0.3s; }
+        .unfld-letter:nth-child(4) { animation-delay: 0.4s; }
+        .unfld-letter:nth-child(5) { animation-delay: 0.5s; }
+        
+        @keyframes unfoldLetter {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            opacity: 0;
+            animation: containerFadeIn 0.8s ease 1.2s forwards;
+        }
+        
+        @keyframes containerFadeIn {
+            to { opacity: 1; }
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 30px;
+            background: #F9F3DD;
+            border-radius: 12px;
+            border: 1px solid rgba(139, 115, 85, 0.15);
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+        }
+        
+        .brand-text {
+            font-size: 2.2em;
+            font-weight: 700;
+            letter-spacing: 8px;
+            color: #1a1a1a;
+            margin-bottom: 8px;
+        }
+        
+        .subtitle {
+            font-size: 0.85em;
+            color: #789080;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+        
+        .section {
+            background: #F9F3DD;
+            border: 1px solid rgba(139, 115, 85, 0.15);
+            border-radius: 16px;
+            padding: 35px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.03);
+        }
+        
+        .section-title {
+            font-size: 0.8em;
+            color: #1a1a1a;
+            letter-spacing: 3px;
+            margin-bottom: 25px;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+        
+        .hero {
+            text-align: center;
+            padding: 40px 20px;
+        }
+        
+        .hero h1 {
+            font-size: 2.8em;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 20px;
+            line-height: 1.3;
+        }
+        
+        .hero p {
+            font-size: 1.2em;
+            color: #5d4037;
+            margin-bottom: 35px;
+            line-height: 1.8;
+        }
+        
+        .price-tag {
+            font-size: 3.5em;
+            font-weight: 700;
+            color: #789080;
+            margin-bottom: 30px;
+        }
+        
+        .btn {
+            background: #789080;
+            color: #f5f3f0;
+            border: none;
+            padding: 16px 40px;
+            cursor: pointer;
+            border-radius: 8px;
+            font-size: 0.9em;
+            font-weight: 600;
+            letter-spacing: 2px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            text-decoration: none;
+            display: inline-block;
+            text-transform: uppercase;
+        }
+        
+        .btn:hover {
+            background: #6d5a44;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+        
+        .feature-box {
+            background: rgba(255, 255, 255, 0.5);
+            border: 1.5px solid rgba(139, 115, 85, 0.2);
+            border-radius: 12px;
+            padding: 28px;
+            transition: all 0.3s ease;
+        }
+        
+        .feature-box:hover {
+            background: rgba(255, 255, 255, 0.7);
+            border-color: #789080;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+            transform: translateY(-2px);
+        }
+        
+        .feature-title {
+            font-size: 1.3em;
+            color: #1a1a1a;
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+        
+        .feature-desc {
+            color: #5d4037;
+            font-size: 0.95em;
+            line-height: 1.7;
+        }
+        
+        .faq-item {
+            margin-bottom: 20px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            border: 1px solid rgba(139, 115, 85, 0.1);
+        }
+        
+        .faq-question {
+            font-size: 1.1em;
+            color: #1a1a1a;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .faq-answer {
+            color: #5d4037;
+            line-height: 1.7;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 50px;
+            padding: 30px;
+            color: #5d4037;
+            font-size: 0.9em;
+        }
+        
+        @media (max-width: 768px) {
+            .brand-text {
+                font-size: 1.6em;
+                letter-spacing: 4px;
+            }
+            
+            .hero h1 {
+                font-size: 2em;
+            }
+            
+            .price-tag {
+                font-size: 2.5em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div class="loading-screen" id="loading-screen">
+        <div class="unfld-animation">
+            <span class="unfld-letter">U</span>
+            <span class="unfld-letter">N</span>
+            <span class="unfld-letter">F</span>
+            <span class="unfld-letter">L</span>
+            <span class="unfld-letter">D</span>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="brand-text">UNFLD</div>
+            <div class="subtitle">Digital Execution System</div>
+        </div>
+
+        <!-- Hero -->
+        <div class="section hero">
+            <h1>Power activates through action.</h1>
+            <p>The complete execution system for intentional builders.<br>Not motivation. Activation.</p>
+            <div class="price-tag">$222</div>
+            <a href="YOUR_STRIPE_PAYMENT_LINK_HERE" class="btn">Get Access Now</a>
+        </div>
+
+        <!-- What's Included -->
+        <div class="section">
+            <div class="section-title">What's Included</div>
+            <div class="features-grid">
+                <div class="feature-box">
+                    <div class="feature-title">POWER</div>
+                    <div class="feature-desc">20 execution commands. Daily prompts that activate action. Draw a card. Execute within 24 hours. Build momentum through consistent movement.</div>
+                </div>
+                <div class="feature-box">
+                    <div class="feature-title">TIMELINE</div>
+                    <div class="feature-desc">90-day execution tracker. Track weekly priorities, commitments, and progress. Visual accountability that keeps you moving forward.</div>
+                </div>
+                <div class="feature-box">
+                    <div class="feature-title">Foundations</div>
+                    <div class="feature-desc">3 execution resources: Reciprocity Is Not Enough, You Have To Decide, RE:SET. Core principles for sustained action.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- How It Works -->
+        <div class="section">
+            <div class="section-title">How It Works</div>
+            <div class="faq-item">
+                <div class="faq-question">Purchase once. Access forever.</div>
+                <div class="faq-answer">One-time payment of $222. Lifetime access to all tools. No subscriptions. No hidden fees. Download links sent immediately after purchase.</div>
+            </div>
+            <div class="faq-item">
+                <div class="faq-question">Start executing immediately.</div>
+                <div class="faq-answer">Access POWER and TIMELINE the moment you complete checkout. Draw your first card. Set your first week. Take action today.</div>
+            </div>
+            <div class="faq-item">
+                <div class="faq-question">Build momentum through consistency.</div>
+                <div class="faq-answer">Daily execution creates clarity. Weekly tracking creates accountability. Consistent action creates transformation.</div>
+            </div>
+        </div>
+
+        <!-- Who This Is For -->
+        <div class="section">
+            <div class="section-title">This Is For You If</div>
+            <div class="faq-answer" style="padding: 0 20px;">
+                You execute. You don't research execution.<br><br>
+                You move when something resonates. You don't wait for consensus.<br><br>
+                You trust your decisions. You don't need external validation.<br><br>
+                If that's you, this system will serve you. If you're still deciding, keep browsing.
+            </div>
+        </div>
+
+        <!-- Final CTA -->
+        <div class="section" style="text-align: center; padding: 50px 35px;">
+            <div class="section-title" style="margin-bottom: 15px;">Ready?</div>
+            <p style="font-size: 1.1em; color: #5d4037; margin-bottom: 30px;">$222. Lifetime access. Immediate delivery.</p>
+            <a href="YOUR_STRIPE_PAYMENT_LINK_HERE" class="btn">Get Access Now</a>
+        </div>
+
+        <!-- Footer -->
+        <footer>
+            &copy; 2026 UNFLD. All rights reserved.
+        </footer>
+    </div>
+
+    <script>
+        // Hide loading screen after animation
+        setTimeout(() => {
+            document.getElementById('loading-screen').classList.add('hidden');
+        }, 1500);
+    </script>
+</body>
+</html>
