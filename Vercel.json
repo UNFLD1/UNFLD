@@ -1,6 +1,17 @@
 {
   "redirects": [
-    { "source": "/power", "destination": "/power.html" },
-    { "source": "/timeline", "destination": "/timeline.html" }
+    { 
+      "source": "/", 
+      "destination": "https://budbgw-mj.myshopify.com", 
+      "permanent": false 
+    },
+    { 
+      "source": "/power", 
+      "destination": "/power.html" 
+    },
+    { 
+      "source": "/timeline", 
+      "destination": "/timeline.html" 
+    }
   ]
 }
